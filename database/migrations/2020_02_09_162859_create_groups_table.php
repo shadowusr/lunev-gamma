@@ -15,6 +15,7 @@ class CreateGroupsTable extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->integer('id');
+            $table->string('service_token');
             $table->string('owner_id');
             $table->timestamps();
 
