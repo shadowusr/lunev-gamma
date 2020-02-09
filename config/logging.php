@@ -35,15 +35,15 @@ return [
     */
 
     'channels' => [
-        'stack' => [
+        /*'stack' => [
             'driver' => 'stack',
             'channels' => ['single'],
             'ignore_exceptions' => false,
-        ],
+        ],*/
 
         'single' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
+            'driver' => 'errorlog',
+            //'path' => storage_path('logs/laravel.log'),
             'level' => 'debug',
         ],
 
@@ -54,15 +54,15 @@ return [
             'days' => 14,
         ],
 
-        'slack' => [
+        /*'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
             'username' => 'Laravel Log',
             'emoji' => ':boom:',
             'level' => 'critical',
-        ],
+        ],*/
 
-        'papertrail' => [
+        /*'papertrail' => [
             'driver' => 'monolog',
             'level' => 'debug',
             'handler' => SyslogUdpHandler::class,
@@ -70,15 +70,15 @@ return [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
             ],
-        ],
+        ],*/
 
         'stderr' => [
-            'driver' => 'monolog',
-            'handler' => StreamHandler::class,
+            'driver' => 'errorlog',
+            /*'handler' => StreamHandler::class,
             'formatter' => env('LOG_STDERR_FORMATTER'),
             'with' => [
                 'stream' => 'php://stderr',
-            ],
+            ],*/
         ],
 
         'syslog' => [
