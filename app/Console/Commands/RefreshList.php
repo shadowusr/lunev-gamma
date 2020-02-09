@@ -11,14 +11,14 @@ class RefreshList extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'list:refresh';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Refresh lists in all groups.';
 
     /**
      * Create a new command instance.
@@ -37,6 +37,13 @@ class RefreshList extends Command
      */
     public function handle()
     {
-        //
+        /*
+        Algorithm (for each group):
+        1. Get bot's post with list and reposts.
+        2. For each repost get number of views on user's wall.
+        3. Sort users according to number of views.
+        4. Generate twig template.
+        5. Edit post with new template.
+        */
     }
 }
