@@ -148,20 +148,65 @@ class RefreshList extends Command
 
             $newText = $this->generatePostText($group, $users);
 
-            $result = json_decode($api->post('wall.edit', [
-                'form_params' => [
-                    'owner_id' => $group->id,
-                    'post_id' => $lastPostId,
-                    'message' => $newText,
-                ],
-            ])->getBody()->getContents(), true);
+            if (time() - $group->last_post_time > 24 * 60 * 60 - 30) {
+                $result = json_decode($api->post('wall.delete', [
+                    'form_params' => [
+                        'owner_id' => $group->id,
+                        'post_id' => $lastPostId,
+                    ],
+                ])->getBody()->getContents(), true);
 
-            if (!$result || !isset($result['response'])) {
-                Log::error('Editing post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
-                continue;
+                if (!$result || !isset($result['response'])) {
+                    Log::error('Removing post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
+                    continue;
+                }
+
+                $result = json_decode($api->post('wall.post', [
+                    'form_params' => [
+                        'owner_id' => $group->id,
+                        'from_group' => 1,
+                        'message' => $newText,
+                    ],
+                ])->getBody()->getContents(), true);
+
+                if (!$result || !isset($result['response'])) {
+                    Log::error('Making post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
+                    continue;
+                }
+
+                $group->last_post_id = $result['response']['post_id'];
+                $group->save();
+                $lastPostId = $this->getLastPostIdByGroup($group);
+
+                $result = json_decode($api->post('wall.pin', [
+                    'form_params' => [
+                        'owner_id' => $group->id,
+                        'post_id' => $lastPostId,
+                    ],
+                ])->getBody()->getContents(), true);
+
+                if (!$result || !isset($result['response'])) {
+                    Log::error('Pinning post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
+                    continue;
+                }
+
+                Log::info('Post was updated successfully for group vk.com/club' . -$group->id);
+            } else {
+                $result = json_decode($api->post('wall.edit', [
+                    'form_params' => [
+                        'owner_id' => $group->id,
+                        'post_id' => $lastPostId,
+                        'message' => $newText,
+                    ],
+                ])->getBody()->getContents(), true);
+
+                if (!$result || !isset($result['response'])) {
+                    Log::error('Editing post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
+                    continue;
+                }
+
+                Log::info('Post was updated successfully for group vk.com/club' . -$group->id);
             }
-
-            Log::info('Post was updated successfully for group vk.com/club' . -$group->id);
         }
     }
 }
