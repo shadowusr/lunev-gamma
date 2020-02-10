@@ -175,6 +175,7 @@ class RefreshList extends Command
                 }
 
                 $group->last_post_id = $result['response']['post_id'];
+                $group->last_post_time = time();
                 $group->save();
                 $lastPostId = $this->getLastPostIdByGroup($group);
 
