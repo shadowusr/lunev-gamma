@@ -18,6 +18,7 @@ class CreateGroupsTable extends Migration
             $table->integer('owner_id');
             $table->integer('last_post_id');
             $table->integer('last_post_time');
+            $table->text('post_layout');
             $table->timestamps();
 
             //$table->foreign('owner_id')->references('id')->on('users')->onUpdate('cascade');
