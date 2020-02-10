@@ -160,6 +160,8 @@ class RefreshList extends Command
                 Log::error('Editing post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
                 continue;
             }
+
+            Log::info('Post was updated successfully for group vk.com/club' . -$group->id);
         }
     }
 }
