@@ -15,11 +15,11 @@ class CreateGroupsTable extends Migration
     {
         Schema::create('groups', function (Blueprint $table) {
             $table->integer('id');
-            $table->string('service_token');
-            $table->string('owner_id');
+            $table->integer('owner_id');
+            $table->integer('last_post_id');
             $table->timestamps();
 
-            $table->foreign('owner_id')->references('id')->on('users')->onUpdate('cascade');
+            //$table->foreign('owner_id')->references('id')->on('users')->onUpdate('cascade');
             $table->primary('id');
         });
     }
