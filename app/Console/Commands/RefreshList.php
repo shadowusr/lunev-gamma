@@ -40,7 +40,7 @@ class RefreshList extends Command
     private function generatePostText(Group $group, $users) {
         // Preparing sandbox for template
         $whitelist['tags'] = ['if', 'for'];
-        $whitelist['filters'] = [];
+        $whitelist['filters'] = ['escape'];
         $whitelist['methods'] = [];
         $whitelist['properties'] = [];
         $whitelist['functions'] = [];
@@ -92,17 +92,17 @@ class RefreshList extends Command
         $api = new Client([
             'base_uri' => 'https://api.vk.com/method/',
             'timeout' => 2.0,
-            'form_params' => [
-                'v' => '5.103',
-                'access_token' => env('VK_BOT_ACCESS_TOKEN'),
+            'curl' => [
+                CURLOPT_SSL_VERIFYPEER => false, // TEMPORARY
             ]
         ]);
 
         $groups = Group::all();
 
         foreach ($groups as $group) {
+            var_dump('GROUP', $group->id);
             $lastPostId = $this->getLastPostIdByGroup($group);
-            if ($lastPostId) {
+            if (!$lastPostId) {
                 continue;
             }
             $reposts = json_decode($api->post('wall.getReposts', [
@@ -110,8 +110,12 @@ class RefreshList extends Command
                     'owner_id' => $group->id,
                     'post_id' => $lastPostId,
                     'count' => 100,
+                    'v' => '5.103',
+                    'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                 ],
             ])->getBody()->getContents(), true);
+
+            var_dump('REPOSTS', $reposts);
 
             if (!$reposts || !isset($reposts['response']['items'])) {
                 Log::error('Unable to get reposts data for group vk.com/club' . -$group->id . '. Dump of vk response: ' . print_r($reposts, true));
@@ -121,15 +125,19 @@ class RefreshList extends Command
             $viewsByUserId = []; // key = user id, value = views count.
 
             foreach ($reposts['response']['items'] as $repost) {
-                $viewsByUserId[$repost['from_id']] = $repost['views']['count'];
+                $viewsByUserId[$repost['from_id']] = $repost['views']['count'] ?? 0;
             }
 
             $users = json_decode($api->post('users.get', [
                 'form_params' => [
                     'user_ids' => implode(',', array_column($reposts['response']['items'], 'from_id')),
                     'lang' => 'ru',
+                    'v' => '5.103',
+                    'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                 ],
             ])->getBody()->getContents(), true);
+
+            var_dump('users', $users);
 
             if (!$users || !isset($users['response'])) {
                 Log::error('Unable to get users data for group vk.com/club' . -$group->id . '. Dump of vk response: ' . print_r($users, true));
@@ -146,13 +154,18 @@ class RefreshList extends Command
                 return $b['views'] <=> $a['views'];
             });
 
+            var_dump('users final', $users);
             $newText = $this->generatePostText($group, $users);
+
+            var_dump('NEW text', $newText);
 
             if (time() - $group->last_post_time > 24 * 60 * 60 - 30) {
                 $result = json_decode($api->post('wall.delete', [
                     'form_params' => [
                         'owner_id' => $group->id,
                         'post_id' => $lastPostId,
+                        'v' => '5.103',
+                        'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                     ],
                 ])->getBody()->getContents(), true);
 
@@ -166,8 +179,13 @@ class RefreshList extends Command
                         'owner_id' => $group->id,
                         'from_group' => 1,
                         'message' => $newText,
+                        'v' => '5.103',
+                        'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                     ],
                 ])->getBody()->getContents(), true);
+
+                var_dump('result', $newText);
+
 
                 if (!$result || !isset($result['response'])) {
                     Log::error('Making post in group vk.com/club' . -$group->id . ' failed! Dump of vk response: ' . print_r($result, true));
@@ -183,6 +201,8 @@ class RefreshList extends Command
                     'form_params' => [
                         'owner_id' => $group->id,
                         'post_id' => $lastPostId,
+                        'v' => '5.103',
+                        'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                     ],
                 ])->getBody()->getContents(), true);
 
@@ -198,6 +218,8 @@ class RefreshList extends Command
                         'owner_id' => $group->id,
                         'post_id' => $lastPostId,
                         'message' => $newText,
+                        'v' => '5.103',
+                        'access_token' => env('VK_BOT_ACCESS_TOKEN'),
                     ],
                 ])->getBody()->getContents(), true);
 

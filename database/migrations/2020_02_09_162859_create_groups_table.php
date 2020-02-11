@@ -18,6 +18,11 @@ class CreateGroupsTable extends Migration
             $table->integer('owner_id');
             $table->integer('last_post_id');
             $table->integer('last_post_time');
+
+            $table->string('confirmation_code');
+            $table->string('access_token');
+            $table->string('secret_key');
+
             $table->text('post_layout');
             $table->timestamps();
 
