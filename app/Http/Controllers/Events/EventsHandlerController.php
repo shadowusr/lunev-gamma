@@ -118,6 +118,13 @@ class EventsHandlerController extends Controller
                     return;
                 }
                 if (!$this->actionPermitted($group, $user)) {
+                    $this->api('messages.send', [
+                        'v' => '5.100',
+                        'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
+                        'peer_id' => $user->id,
+                        'message' => '⚠ Нет доступа.',
+                        'random_id' => rand(),
+                    ]);
                     return;
                 }
                 if (count($command) == 1) {
