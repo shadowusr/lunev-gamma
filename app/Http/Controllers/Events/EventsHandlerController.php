@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Events;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
 class EventsHandlerController extends Controller
@@ -87,7 +88,8 @@ class EventsHandlerController extends Controller
                             'v' => '5.100',
                             'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
                             'peer_id' => $user->id,
-                            'message' => '✔ Группа выбрана.'
+                            'message' => '✔ Группа выбрана.',
+                            'random_id' => rand(),
                         ]);
                         break;
                 }
@@ -110,6 +112,7 @@ class EventsHandlerController extends Controller
                         'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
                         'peer_id' => $user->id,
                         'message' => $group->post_layout,
+                        'random_id' => rand(),
                     ]);
                 } elseif (count($command) == 2) {
                     $group->post_layout = $command[1];
@@ -118,19 +121,24 @@ class EventsHandlerController extends Controller
                         'v' => '5.100',
                         'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
                         'peer_id' => $user->id,
-                        'message' => '✔ Шаблон поста изменен.'
+                        'message' => '✔ Шаблон поста изменен.',
+                        'random_id' => rand(),
                     ]);
                 } else {
                     return;
                 }
                 break;
             case '/ping':
+                if (count($command) != 1) {
+                    return;
+                }
                 if ($message['peer_id'] == 580598350) {
                     $this->api('messages.send', [
                         'v' => '5.100',
                         'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
                         'peer_id' => $message['peer_id'],
-                        'message' => '✔ Online.'
+                        'message' => '✔ Online.',
+                        'random_id' => rand(),
                     ]);
                 }
                 break;
