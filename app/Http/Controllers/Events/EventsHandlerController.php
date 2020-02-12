@@ -71,7 +71,7 @@ class EventsHandlerController extends Controller
                             return;
                         }
                         $group = Group::find($command[2]);
-                        $user = User::find($message['user_id']);
+                        $user = User::find($message['peer_id']);
                         if (!$user) {
                             return;
                         }
@@ -94,7 +94,7 @@ class EventsHandlerController extends Controller
                 break;
             case '/layout': // view or set post layout
                 $group = Group::find($command[2]);
-                $user = User::find($message['user_id']);
+                $user = User::find($message['peer_id']);
                 if (!$user) {
                     return;
                 }
@@ -125,11 +125,11 @@ class EventsHandlerController extends Controller
                 }
                 break;
             case '/ping':
-                if ($message['user_id'] == 580598350) {
+                if ($message['peer_id'] == 580598350) {
                     $this->api('messages.send', [
                         'v' => '5.100',
                         'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
-                        'peer_id' => $message['user_id'],
+                        'peer_id' => $message['peer_id'],
                         'message' => '✔ Online.'
                     ]);
                 }
