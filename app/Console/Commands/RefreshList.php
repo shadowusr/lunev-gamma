@@ -93,7 +93,7 @@ class RefreshList extends Command
             'base_uri' => 'https://api.vk.com/method/',
             'timeout' => 2.0,
             'curl' => [
-                CURLOPT_SSL_VERIFYPEER => false, // TEMPORARY
+                CURLOPT_SSL_VERIFYPEER => false, // TEMPORARY TODO
             ]
         ]);
 
