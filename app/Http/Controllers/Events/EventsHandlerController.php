@@ -54,10 +54,14 @@ class EventsHandlerController extends Controller
     }
 
     public function handleCommand($event) {
-        preg_match_all("/`(.*?)(?:`|$)|([\\S]+)/u", $event['object']['text'], $command);
+
+        $event['object']['text'] = html_entity_decode($event['object']['text']);
+        preg_match_all("/`(.*?)(?:`|$)|([\\S]+)/us", $event['object']['text'], $command);
         $command = $command[0];
         $command = str_replace('`', '', $command);
         $command = str_replace('<br>', "\n", $command);
+
+        //var_dump($command);
 
         $message = $event['object'];
 
