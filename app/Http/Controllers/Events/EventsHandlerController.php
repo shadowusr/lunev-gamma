@@ -95,8 +95,8 @@ class EventsHandlerController extends Controller
                 }
                 break;
             case '/layout': // view or set post layout
-                $group = Group::find($command[2]);
                 $user = User::find($message['peer_id']);
+                $group = Group::find($user->selected_group);
                 if (!$user) {
                     return;
                 }
