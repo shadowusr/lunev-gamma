@@ -98,9 +98,23 @@ class EventsHandlerController extends Controller
                 $user = User::find($message['peer_id']);
                 $group = Group::find($user->selected_group);
                 if (!$user) {
+                    $this->api('messages.send', [
+                        'v' => '5.100',
+                        'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
+                        'peer_id' => $user->id,
+                        'message' => '⚠ Пользователь не найден.',
+                        'random_id' => rand(),
+                    ]);
                     return;
                 }
                 if (!$group) {
+                    $this->api('messages.send', [
+                        'v' => '5.100',
+                        'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
+                        'peer_id' => $user->id,
+                        'message' => '⚠ Группа не найдена.',
+                        'random_id' => rand(),
+                    ]);
                     return;
                 }
                 if (!$this->actionPermitted($group, $user)) {
@@ -125,6 +139,13 @@ class EventsHandlerController extends Controller
                         'random_id' => rand(),
                     ]);
                 } else {
+                    $this->api('messages.send', [
+                        'v' => '5.100',
+                        'access_token' => env('VK_GROUP_ACCESS_TOKEN'),
+                        'peer_id' => $user->id,
+                        'message' => '⚠ Ошибка в синтаксисе команды.',
+                        'random_id' => rand(),
+                    ]);
                     return;
                 }
                 break;
